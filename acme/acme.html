@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<title>ACME哨子 - 极致运动礼品</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+		<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+		<style>
+			/* 移动端优化CSS */
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+				-webkit-tap-highlight-color: transparent;
+			}
+
+			body {
+				background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+				color: #fff;
+				min-height: 100vh;
+				padding: 16px;
+				overflow-x: hidden;
+				line-height: 1.5;
+				font-size: 14px;
+			}
+
+			.container {
+				max-width: 100%;
+				margin: 0 auto;
+			}
+
+			/* 头部区域 */
+			header {
+				text-align: center;
+				padding: 20px 0 10px;
+			}
+
+			header h1 {
+				font-size: 1.8rem;
+				margin-bottom: 8px;
+				text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+				background: linear-gradient(to right, #ff8a00, #e52e71, #22c1c3);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				letter-spacing: 1px;
+			}
+
+			header p {
+				font-size: 0.9rem;
+				opacity: 0.9;
+				padding: 0 16px;
+			}
+
+			/* 高级步骤条样式 - 重新设计 */
+			.progress-container {
+				position: relative;
+				display: flex;
+				justify-content: space-between;
+				margin: 30px 0 40px;
+				padding: 0 5px;
+				/* 减少左右padding */
+				max-width: 100%;
+				overflow: hidden;
+			}
+
+			.progress-line {
+				position: absolute;
+				top: 22px;
+				/* 调整位置 */
+				left: 8%;
+				/* 减少左边距 */
+				right: 8%;
+				/* 减少右边距 */
+				height: 4px;
+				background: rgba(255, 255, 255, 0.15);
+				z-index: 1;
+				border-radius: 2px;
+				overflow: hidden;
+			}
+
+			.progress-line::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(255, 255, 255, 0.1);
+			}
+
+			.progress-fill {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+				background: linear-gradient(90deg, #ff8a00, #e52e71);
+				width: 0%;
+				transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+				z-index: 2;
+				border-radius: 2px;
+				box-shadow: 0 0 10px rgba(255, 138, 0, 0.5);
+			}
+
+			.step {
+				position: relative;
+				width: 40px;
+				/* 减小宽度 */
+				height: 40px;
+				/* 减小高度 */
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				z-index: 3;
+				flex-shrink: 0;
+			}
+
+			.step-circle {
+				width: 40px;
+				/* 减小圆圈尺寸 */
+				height: 40px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-weight: bold;
+				font-size: 0.9rem;
+				/* 减小字体 */
+				background: rgba(255, 255, 255, 0.1);
+				border: 2px solid rgba(255, 255, 255, 0.2);
+				/* 减小边框 */
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+				position: relative;
+				overflow: hidden;
+			}
+
+			.step-circle::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+				z-index: 1;
+			}
+
+			.step.active .step-circle {
+				background: linear-gradient(135deg, #ff8a00, #e52e71);
+				border-color: #ff8a00;
+				transform: scale(1.15);
+				box-shadow: 0 0 25px rgba(255, 138, 0, 0.7), 0 8px 20px rgba(0, 0, 0, 0.3);
+				animation: pulse 2s infinite;
+			}
+
+			.step.completed .step-circle {
+				background: linear-gradient(135deg, #22c1c3, #2a9d8f);
+				border-color: #22c1c3;
+			}
+
+			.step.completed .step-circle::after {
+				content: '✓';
+				position: absolute;
+				color: white;
+				font-size: 1.2rem;
+				font-weight: bold;
+			}
+
+			.step.completed .step-circle span {
+				opacity: 0;
+			}
+
+			.step-label {
+				margin-top: 8px;
+				font-size: 0.65rem;
+				/* 减小标签字体 */
+				font-weight: 500;
+				text-align: center;
+				opacity: 0.7;
+				transition: all 0.3s ease;
+				white-space: nowrap;
+				width: 60px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.step.active .step-label {
+				opacity: 1;
+				color: #ff8a00;
+				font-weight: 600;
+				transform: translateY(2px);
+			}
+
+			.step.completed .step-label {
+				color: #22c1c3;
+			}
+
+			@keyframes pulse {
+				0% {
+					box-shadow: 0 0 25px rgba(255, 138, 0, 0.7), 0 8px 20px rgba(0, 0, 0, 0.3);
+				}
+
+				50% {
+					box-shadow: 0 0 30px rgba(255, 138, 0, 0.9), 0 10px 25px rgba(0, 0, 0, 0.4);
+				}
+
+				100% {
+					box-shadow: 0 0 25px rgba(255, 138, 0, 0.7), 0 8px 20px rgba(0, 0, 0, 0.3);
+				}
+			}
+
+			/* 内容区域 - 移动端优化 */
+			.content {
+				background: rgba(25, 25, 35, 0.9);
+				backdrop-filter: blur(10px);
+				border-radius: 16px;
+				padding: 24px 20px;
+				box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+				margin-bottom: 20px;
+				min-height: 400px;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.content::before {
+				content: '';
+				position: absolute;
+				top: -50%;
+				left: -50%;
+				width: 200%;
+				height: 200%;
+				background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+				z-index: -1;
+			}
+
+			.step-content {
+				display: none;
+				animation: slideInMobile 0.4s ease-out;
+			}
+
+			.step-content.active {
+				display: block;
+			}
+
+			.step-content h2 {
+				font-size: 1.3rem;
+				margin-bottom: 12px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.step-content p {
+				margin: 10px 0 20px;
+				opacity: 0.9;
+				font-size: 0.9rem;
+			}
+
+			/* 商品网格 - 移动端优化 */
+			.product-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+				gap: 16px;
+				margin-top: 16px;
+			}
+
+			.product-card {
+				background: rgba(40, 40, 55, 0.7);
+				border-radius: 12px;
+				padding: 16px 12px;
+				text-align: center;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				border: 2px solid transparent;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.product-card.selected {
+				border-color: #e52e71;
+				box-shadow: 0 0 15px rgba(229, 46, 113, 0.5);
+			}
+
+			.product-img {
+				width: 80px;
+				height: 80px;
+				margin: 0 auto 12px;
+				background: linear-gradient(135deg, #ff8a00, #e52e71);
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 2rem;
+				overflow: hidden;
+			}
+
+			.product-img img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				border-radius: 50%;
+			}
+
+			.product-name {
+				font-size: 1rem;
+				margin-bottom: 8px;
+				color: #ff8a00;
+			}
+
+			.product-price {
+				font-size: 1rem;
+				font-weight: bold;
+				color: #22c1c3;
+			}
+
+			/* 选项网格 - 移动端优化 */
+			.options-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+				gap: 12px;
+				margin-top: 16px;
+			}
+
+			.option-card {
+				background: rgba(40, 40, 55, 0.7);
+				border-radius: 12px;
+				padding: 16px 8px;
+				text-align: center;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				border: 2px solid transparent;
+			}
+
+			.option-card.selected {
+				border-color: #22c1c3;
+				box-shadow: 0 0 10px rgba(34, 193, 195, 0.5);
+			}
+
+			/* 配件网格 - 移动端优化 */
+			.accessories-grid {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 12px;
+				margin-top: 16px;
+			}
+
+			.accessory-card {
+				background: rgba(40, 40, 55, 0.7);
+				border-radius: 12px;
+				padding: 14px;
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				border: 2px solid transparent;
+			}
+
+			.accessory-card.selected {
+				border-color: #ff8a00;
+				box-shadow: 0 0 10px rgba(255, 138, 0, 0.5);
+			}
+
+			.accessory-icon {
+				width: 45px;
+				height: 45px;
+				background: linear-gradient(135deg, #ff8a00, #e52e71);
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 1.2rem;
+				flex-shrink: 0;
+			}
+
+			.accessory-info {
+				flex: 1;
+			}
+
+			.accessory-name {
+				font-weight: bold;
+				margin-bottom: 4px;
+			}
+
+			.accessory-price {
+				color: #22c1c3;
+				font-weight: bold;
+				font-size: 1rem;
+			}
+
+			.accessory-desc {
+				font-size: 0.8rem;
+				opacity: 0.8;
+				margin-top: 2px;
+			}
+
+			/* 个性化选项 - 移动端优化 */
+			.personalization-options {
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+				margin-top: 20px;
+			}
+
+			.personalization-option {
+				background: rgba(40, 40, 55, 0.7);
+				border-radius: 12px;
+				padding: 20px;
+				text-align: center;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				border: 2px solid transparent;
+			}
+
+			.personalization-option.selected {
+				border-color: #22c1c3;
+				box-shadow: 0 0 10px rgba(34, 193, 195, 0.5);
+			}
+
+			.personalization-icon {
+				width: 60px;
+				height: 60px;
+				background: linear-gradient(135deg, #22c1c3, #2a9d8f);
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin: 0 auto 16px;
+				font-size: 1.8rem;
+			}
+
+			.personalization-option h3 {
+				font-size: 1.1rem;
+				margin-bottom: 8px;
+			}
+
+			/* 刻字输入框 */
+			.engraving-input-container {
+				margin-top: 20px;
+				padding: 16px;
+				background: rgba(40, 40, 55, 0.7);
+				border-radius: 12px;
+			}
+
+			.engraving-input-container h4 {
+				margin-bottom: 12px;
+				font-size: 1rem;
+			}
+
+			#customTextInput {
+				width: 100%;
+				padding: 14px;
+				background: rgba(30, 30, 40, 0.8);
+				border: 2px solid #22c1c3;
+				border-radius: 10px;
+				color: white;
+				font-size: 1rem;
+				margin-bottom: 8px;
+			}
+
+			.char-count {
+				text-align: right;
+				font-size: 0.8rem;
+				color: #aaa;
+			}
+
+			/* 留言输入框 */
+			.message-input {
+				width: 100%;
+				height: 120px;
+				background: rgba(40, 40, 55, 0.7);
+				border: 2px solid rgba(255, 255, 255, 0.2);
+				border-radius: 12px;
+				padding: 16px;
+				color: white;
+				font-size: 1rem;
+				resize: none;
+				margin-top: 16px;
+			}
+
+			.message-input:focus {
+				outline: none;
+				border-color: #e52e71;
+			}
+
+			/* 地址表单 - 移动端优化 */
+			.address-form {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 16px;
+				margin-top: 16px;
+			}
+
+			.form-group {
+				margin-bottom: 16px;
+			}
+
+			.form-group label {
+				display: block;
+				margin-bottom: 8px;
+				font-weight: 500;
+				font-size: 0.9rem;
+			}
+
+			.form-group input {
+				width: 100%;
+				padding: 14px;
+				background: rgba(40, 40, 55, 0.7);
+				border: 2px solid rgba(255, 255, 255, 0.2);
+				border-radius: 10px;
+				color: white;
+				font-size: 1rem;
+			}
+
+			.form-group input:focus {
+				outline: none;
+				border-color: #ff8a00;
+			}
+
+			/* 按钮容器 - 移动端优化 */
+			.btn-container {
+				display: flex;
+				justify-content: space-between;
+				margin-top: 30px;
+				gap: 12px;
+			}
+
+			.btn {
+				padding: 14px 24px;
+				border: none;
+				border-radius: 50px;
+				font-size: 1rem;
+				font-weight: bold;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				flex: 1;
+				white-space: nowrap;
+			}
+
+			.btn-prev {
+				background: rgba(255, 255, 255, 0.15);
+				color: white;
+			}
+
+			.btn-next {
+				background: linear-gradient(135deg, #ff8a00, #e52e71);
+				color: white;
+			}
+
+			.btn-submit {
+				background: linear-gradient(135deg, #22c1c3, #2a9d8f);
+				color: white;
+			}
+
+			/* 礼品动画 */
+			.gift-animation {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: rgba(25, 25, 35, 0.95);
+				z-index: 1000;
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.5s ease;
+			}
+
+			.gift-animation.active {
+				opacity: 1;
+				pointer-events: all;
+			}
+
+			.gift-box {
+				width: 150px;
+				height: 150px;
+				position: relative;
+				transform-style: preserve-3d;
+				animation: rotateBox 20s infinite linear;
+			}
+
+			/* 加载动画 */
+			.loading {
+				display: inline-block;
+				width: 20px;
+				height: 20px;
+				border: 3px solid rgba(255, 255, 255, 0.3);
+				border-radius: 50%;
+				border-top-color: #ff8a00;
+				animation: spin 1s ease-in-out infinite;
+			}
+
+			.loading-message {
+				text-align: center;
+				padding: 40px;
+				font-size: 1rem;
+			}
+
+			/* 错误消息 */
+			.error-message {
+				background: rgba(229, 46, 113, 0.2);
+				border: 1px solid #e52e71;
+				border-radius: 10px;
+				padding: 15px;
+				margin: 20px 0;
+				text-align: center;
+			}
+
+			/* 底部 */
+			footer {
+				text-align: center;
+				padding: 16px;
+				opacity: 0.7;
+				font-size: 0.8rem;
+			}
+
+			/* 动画定义 */
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(-10px);
+				}
+
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes slideInMobile {
+				from {
+					opacity: 0;
+					transform: translateX(20px);
+				}
+
+				to {
+					opacity: 1;
+					transform: translateX(0);
+				}
+			}
+
+			@keyframes rotateBox {
+				0% {
+					transform: rotateY(0deg);
+				}
+
+				100% {
+					transform: rotateY(360deg);
+				}
+			}
+
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			/* 移动端优化媒体查询 */
+			@media (min-width: 768px) {
+				body {
+					padding: 20px;
+				}
+
+				.container {
+					max-width: 500px;
+				}
+
+				.step {
+					width: 55px;
+					height: 55px;
+				}
+
+				.step-circle {
+					width: 55px;
+					height: 55px;
+					font-size: 1.2rem;
+				}
+
+				.step-label {
+					font-size: 0.8rem;
+				}
+
+				.product-grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
+
+				.options-grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
+
+				.personalization-options {
+					flex-direction: row;
+				}
+			}
+
+			/* 防止iOS Safari上的橡皮筋效果 */
+			body {
+				overscroll-behavior-y: contain;
+			}
+
+			/* 优化触摸反馈 */
+			.product-card:active,
+			.option-card:active,
+			.accessory-card:active,
+			.personalization-option:active,
+			.btn:active {
+				transform: scale(0.98);
+			}
+
+			/* 移除移动端hover效果 */
+			@media (hover: none) {
+
+				.product-card:hover,
+				.option-card:hover,
+				.accessory-card:hover,
+				.personalization-option:hover,
+				.btn:hover {
+					transform: none;
+				}
+			}
+
+			/* 自定义Toast样式 */
+			.custom-toast {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: rgba(0, 0, 0, 0.85);
+				color: white;
+				padding: 16px 24px;
+				border-radius: 10px;
+				z-index: 9999;
+				font-size: 14px;
+				max-width: 80%;
+				text-align: center;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+				animation: toastFadeInOut 0.3s ease;
+			}
+
+			@keyframes toastFadeInOut {
+				0% {
+					opacity: 0;
+					transform: translate(-50%, -40%);
+				}
+
+				100% {
+					opacity: 1;
+					transform: translate(-50%, -50%);
+				}
+			}
+
+			/* 针对移动端小屏幕的优化 */
+			@media (max-width: 375px) {
+				.step {
+					width: 35px;
+					height: 55px;
+				}
+
+				.step-circle {
+					width: 35px;
+					height: 35px;
+					font-size: 0.8rem;
+				}
+
+				.step-label {
+					font-size: 0.6rem;
+					width: 50px;
+				}
+
+				.progress-line {
+					left: 5%;
+					right: 5%;
+					top: 18px;
+				}
+			}
+
+			/* 平板和桌面端优化 */
+			@media (min-width: 768px) {
+				.step {
+					width: 45px;
+					height: 45px;
+				}
+
+				.step-circle {
+					width: 45px;
+					height: 45px;
+					font-size: 1rem;
+				}
+
+				.step-label {
+					font-size: 0.75rem;
+					width: 70px;
+				}
+
+				.progress-line {
+					left: 6%;
+					right: 6%;
+					top: 24px;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="container">
+			<header>
+				<h1>ACME 哨子</h1>
+				<p>为运动爱好者打造的极致礼品体验</p>
+			</header>
+
+			<!-- 高级步骤条 -->
+			<div class="progress-container">
+				<div class="progress-line"></div>
+				<div class="progress-fill" id="progressFill"></div>
+
+				<div class="step active" data-step="1">
+					<div class="step-circle"><span>1</span></div>
+					<div class="step-label">选择商品</div>
+				</div>
+				<div class="step" data-step="2">
+					<div class="step-circle"><span>2</span></div>
+					<div class="step-label">颜色材质</div>
+				</div>
+				<div class="step" data-step="3">
+					<div class="step-circle"><span>3</span></div>
+					<div class="step-label">配件选择</div>
+				</div>
+				<div class="step" data-step="4">
+					<div class="step-circle"><span>4</span></div>
+					<div class="step-label">个性定制</div>
+				</div>
+				<div class="step" data-step="5">
+					<div class="step-circle"><span>5</span></div>
+					<div class="step-label">寄语祝福</div>
+				</div>
+				<div class="step" data-step="6">
+					<div class="step-circle"><span>6</span></div>
+					<div class="step-label">配送地址</div>
+				</div>
+			</div>
+
+			<div class="content">
+				<!-- 步骤1: 选择商品 -->
+				<div class="step-content active" id="step1">
+					<h2><i class="fas fa-shopping-bag"></i> 选择您的ACME哨子</h2>
+					<p>我们提供多种专业运动哨子，满足不同场景需求</p>
+
+					<div class="product-grid" id="productGrid">
+						<!-- 商品将通过AJAX动态加载 -->
+						<div class="loading-message">加载商品中...</div>
+					</div>
+
+					<div class="btn-container">
+						<div></div>
+						<button class="btn btn-next" onclick="nextStep()">
+							<span>下一步</span>
+							<i class="fas fa-arrow-right"></i>
+						</button>
+					</div>
+				</div>
+
+				<!-- 步骤2: 颜色材质 -->
+				<div class="step-content" id="step2">
+					<h2><i class="fas fa-palette"></i> 选择颜色与材质</h2>
+					<p>为您的哨子选择最合适的外观</p>
+
+					<div class="options-grid" id="colorOptions">
+						<!-- 颜色材质将通过AJAX动态加载 -->
+					</div>
+
+					<div class="btn-container">
+						<button class="btn btn-prev" onclick="prevStep()">
+							<i class="fas fa-arrow-left"></i>
+							<span>上一步</span>
+						</button>
+						<button class="btn btn-next" onclick="nextStep()">
+							<span>下一步</span>
+							<i class="fas fa-arrow-right"></i>
+						</button>
+					</div>
+				</div>
+
+				<!-- 步骤3: 配件选择 -->
+				<div class="step-content" id="step3">
+					<h2><i class="fas fa-cogs"></i> 选择配件</h2>
+					<p>提升您的使用体验</p>
+
+					<div class="accessories-grid" id="accessoriesGrid">
+						<!-- 配件将通过AJAX动态加载 -->
+					</div>
+
+					<div class="btn-container">
+						<button class="btn btn-prev" onclick="prevStep()">
+							<i class="fas fa-arrow-left"></i>
+							<span>上一步</span>
+						</button>
+						<button class="btn btn-next" onclick="nextStep()">
+							<span>下一步</span>
+							<i class="fas fa-arrow-right"></i>
+						</button>
+					</div>
+				</div>
+
+				<!-- 步骤4: 个性化定制 -->
+				<div class="step-content" id="step4">
+					<h2><i class="fas fa-edit"></i> 个性化定制</h2>
+					<p>让您的哨子独一无二</p>
+
+					<div class="personalization-options">
+						<div class="personalization-option" data-personalization="engraving">
+							<div class="personalization-icon">
+								<i class="fas fa-font"></i>
+							</div>
+							<h3>文字刻字</h3>
+							<p>在哨子上刻上名字或短句</p>
+						</div>
+						<div class="personalization-option" data-personalization="logo">
+							<div class="personalization-icon">
+								<i class="fas fa-image"></i>
+							</div>
+							<h3>Logo标识</h3>
+							<p>上传您的专属Logo图案</p>
+						</div>
+					</div>
+
+					<!-- 刻字输入框容器 -->
+					<div id="engravingInputContainer" style="display: none;"></div>
+
+					<div class="btn-container">
+						<button class="btn btn-prev" onclick="prevStep()">
+							<i class="fas fa-arrow-left"></i>
+							<span>上一步</span>
+						</button>
+						<button class="btn btn-next" onclick="nextStep()">
+							<span>下一步</span>
+							<i class="fas fa-arrow-right"></i>
+						</button>
+					</div>
+				</div>
+
+				<!-- 步骤5: 寄语祝福 -->
+				<div class="step-content" id="step5">
+					<h2><i class="fas fa-comment-alt"></i> 寄语祝福</h2>
+					<p>为收礼人留下您的祝福</p>
+
+					<textarea class="message-input" placeholder="写下您想对收礼人说的话..." id="blessingsText"></textarea>
+
+					<div class="btn-container">
+						<button class="btn btn-prev" onclick="prevStep()">
+							<i class="fas fa-arrow-left"></i>
+							<span>上一步</span>
+						</button>
+						<button class="btn btn-next" onclick="nextStep()">
+							<span>下一步</span>
+							<i class="fas fa-arrow-right"></i>
+						</button>
+					</div>
+				</div>
+
+				<!-- 步骤6: 地址 -->
+				<div class="step-content" id="step6">
+					<h2><i class="fas fa-map-marker-alt"></i> 配送信息</h2>
+					<p>请填写收货地址</p>
+
+					<div class="address-form">
+						<div class="form-group">
+							<label for="name">收货人姓名</label>
+							<input type="text" id="name" placeholder="请输入姓名">
+						</div>
+						<div class="form-group">
+							<label for="phone">联系电话</label>
+							<input type="tel" id="phone" placeholder="请输入手机号">
+						</div>
+						<div class="form-group">
+							<label for="address">详细地址</label>
+							<input type="text" id="address" placeholder="省市区街道门牌号">
+						</div>
+					</div>
+
+					<div class="btn-container">
+						<button class="btn btn-prev" onclick="prevStep()">
+							<i class="fas fa-arrow-left"></i>
+							<span>上一步</span>
+						</button>
+						<button class="btn btn-submit" onclick="submitOrder()">
+							<i class="fas fa-gift"></i>
+							<span>提交订单</span>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- 礼品包装动画 -->
+			<div class="gift-animation" id="giftAnimation">
+				<div class="gift-box floating">
+					<div class="gift-lid"></div>
+					<div class="gift-body"></div>
+					<div class="ribbon-vertical"></div>
+					<div class="ribbon-horizontal"></div>
+					<div class="bow">
+						<i class="fas fa-bowling-ball"></i>
+					</div>
+				</div>
+			</div>
+
+			<footer>
+				<p>© 2025 ACME Sports. 所有权利保留。 | 专业运动装备制造商</p>
+			</footer>
+		</div>
+
+		<script>
+			// 全局变量
+			let currentStep = 1;
+			const totalSteps = 6;
+			const progressFill = document.getElementById('progressFill');
+			const giftAnimation = document.getElementById('giftAnimation');
+			const baseApiUrl = 'http://192.168.3.23:84/index.php?s=/api/goodsH5';
+
+			// 添加配件加载状态标志
+			let accessoriesLoaded = false;
+
+			// 存储用户选择的数据 - 保持原有结构
+			let userSelection = {
+				goods: null, // 主商品
+				color: null, // 颜色规格
+				accessory: null, // 配件商品（独立商品）
+				accessories: [], // 配件数组（保持兼容性）
+				personalization: null, // 个性化定制类型
+				customText: '', // 刻字内容
+				message: '', // 祝福语
+				address: {} // 地址信息
+			};
+
+			// 更新进度条
+			function updateProgress() {
+				const progressPercentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
+				progressFill.style.width = `${progressPercentage}%`;
+
+				// 更新步骤状态
+				document.querySelectorAll('.step').forEach(step => {
+					const stepNum = parseInt(step.getAttribute('data-step'));
+					step.classList.remove('active', 'completed');
+
+					if (stepNum < currentStep) {
+						step.classList.add('completed');
+					} else if (stepNum === currentStep) {
+						step.classList.add('active');
+					}
+				});
+
+				// 显示当前步骤内容
+				document.querySelectorAll('.step-content').forEach(content => {
+					content.classList.remove('active');
+				});
+				document.getElementById(`step${currentStep}`).classList.add('active');
+
+				// 当切换到特定步骤时，加载对应的数据
+				if (currentStep === 1 && !userSelection.goods) {
+					loadGoods();
+				} else if (currentStep === 2 && userSelection.goods && !userSelection.color) {
+					loadColors(userSelection.goods.goods_id);
+				} else if (currentStep === 3 && userSelection.goods && !accessoriesLoaded) {
+					// 修复：只有当配件未加载时才加载
+					loadAccessories(userSelection.goods.goods_id);
+				}
+			}
+
+			// 下一步
+			function nextStep() {
+				// 验证当前步骤是否完成
+				if (!validateCurrentStep()) {
+					return;
+				}
+
+				if (currentStep < totalSteps) {
+					currentStep++;
+					updateProgress();
+				}
+			}
+
+			// 上一步
+			function prevStep() {
+				if (currentStep > 1) {
+					currentStep--;
+					updateProgress();
+				}
+			}
+
+			// 验证当前步骤
+			function validateCurrentStep() {
+				switch (currentStep) {
+					case 1:
+						if (!userSelection.goods) {
+							showToast('请选择一件商品');
+							return false;
+						}
+						break;
+					case 2:
+						if (!userSelection.color) {
+							showToast('请选择颜色材质');
+							return false;
+						}
+						break;
+					case 3:
+						// 配件是可选的，不需要验证
+						break;
+					case 4:
+						if (!userSelection.personalization) {
+							showToast('请选择个性化定制选项');
+							return false;
+						}
+						if (userSelection.personalization === 'engraving' && !userSelection.customText.trim()) {
+							showToast('请输入刻字内容');
+							return false;
+						}
+						break;
+					case 5:
+						const message = document.getElementById('blessingsText').value.trim();
+						if (message.length < 5) {
+							showToast('请至少输入5个字的祝福语');
+							return false;
+						}
+						userSelection.message = message;
+						break;
+					case 6:
+						const name = document.getElementById('name').value.trim();
+						const phone = document.getElementById('phone').value.trim();
+						const address = document.getElementById('address').value.trim();
+
+						if (!name) {
+							showToast('请输入收货人姓名');
+							return false;
+						}
+						if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+							showToast('请输入正确的手机号');
+							return false;
+						}
+						if (!address) {
+							showToast('请输入详细地址');
+							return false;
+						}
+
+						userSelection.address = {
+							name,
+							phone,
+							address
+						};
+						break;
+				}
+				return true;
+			}
+
+			// 显示Toast提示
+			function showToast(message, duration = 2000) {
+				// 移除现有的toast
+				const existingToast = document.querySelector('.custom-toast');
+				if (existingToast) existingToast.remove();
+
+				// 创建toast元素
+				const toast = document.createElement('div');
+				toast.className = 'custom-toast';
+				toast.innerHTML = message;
+				document.body.appendChild(toast);
+
+				// 自动移除
+				setTimeout(() => {
+					if (toast.parentNode) {
+						toast.style.opacity = '0';
+						toast.style.transition = 'opacity 0.3s ease';
+						setTimeout(() => {
+							if (toast.parentNode) toast.remove();
+						}, 300);
+					}
+				}, duration);
+			}
+
+			// 加载商品数据 - 使用原有接口
+			function loadGoods() {
+				const productGrid = $('#productGrid');
+				productGrid.html('<div class="loading-message"><span class="loading"></span> 加载商品中...</div>');
+
+				$.ajax({
+					url: `${baseApiUrl}/list`,
+					type: 'GET',
+					data: {
+						page: 1,
+						listType: 'all',
+						status: 10 // 只获取上架商品
+					},
+					dataType: 'json',
+					success: function(response) {
+						if (response.status === 200 && response.data && response.data.list) {
+							const goodsList = response.data.list.data || response.data.list;
+							renderGoods(goodsList);
+						} else {
+							productGrid.html('<div class="error-message">加载商品失败，请稍后重试</div>');
+						}
+					},
+					error: function(xhr, status, error) {
+						console.error('商品加载错误:', error);
+						productGrid.html('<div class="error-message">无法连接到服务器，请检查网络</div>');
+					}
+				});
+			}
+
+			// 渲染商品列表 - 使用原有逻辑
+			function renderGoods(goodsList) {
+				const productGrid = $('#productGrid');
+				productGrid.empty();
+
+				if (!goodsList || goodsList.length === 0) {
+					productGrid.html('<div class="error-message">暂无商品</div>');
+					return;
+				}
+
+				goodsList.forEach(goods => {
+					const price = goods.goods_price_min || '0.00';
+					const productCard = `
+	                    <div class="product-card" data-goods-id="${goods.goods_id}">
+	                        <div class="product-img">
+	                            ${goods.goods_image ?
+	                                `<img src="${goods.goods_image}" alt="${goods.goods_name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\\'fas fa-bullhorn whistle-icon\\'></i>';" />` :
+	                                '<i class="fas fa-bullhorn whistle-icon"></i>'
+	                            }
+	                        </div>
+	                        <div class="product-name">${goods.goods_name}</div>
+	                        <div class="product-price">¥${price}</div>
+	                        ${goods.selling_point ? `<p style="font-size: 0.8rem; margin-top: 5px; opacity: 0.8;">${goods.selling_point}</p>` : ''}
+	                    </div>
+	                `;
+					productGrid.append(productCard);
+				});
+
+				// 绑定商品选择事件
+				productGrid.find('.product-card').on('click', function() {
+					const goodsId = $(this).data('goods-id');
+					const selectedGoods = goodsList.find(g => g.goods_id == goodsId);
+
+					userSelection.goods = selectedGoods;
+
+					// 重置配件加载状态
+					accessoriesLoaded = false;
+
+					// 更新UI
+					productGrid.find('.product-card').removeClass('selected');
+					$(this).addClass('selected');
+
+					// 清空后续步骤的选择
+					userSelection.color = null;
+					userSelection.accessory = null;
+					userSelection.accessories = [];
+					$('#colorOptions').empty();
+					$('#accessoriesGrid').empty();
+				});
+			}
+
+			// 加载颜色材质数据 - 使用原有接口
+			function loadColors(goodsId) {
+				const colorOptions = $('#colorOptions');
+				colorOptions.html('<div class="loading-message"><span class="loading"></span> 加载颜色材质中...</div>');
+
+				$.ajax({
+					url: `${baseApiUrl}/spec`,
+					type: 'GET',
+					data: {
+						goods_id: goodsId
+					},
+					dataType: 'json',
+					success: function(response) {
+						if (response.status === 200 && response.data) {
+							renderColors(response.data);
+						} else {
+							colorOptions.html('<div class="error-message">加载颜色材质失败</div>');
+						}
+					},
+					error: function() {
+						colorOptions.html('<div class="error-message">加载颜色材质失败，请稍后重试</div>');
+					}
+				});
+			}
+
+			// 渲染颜色材质 - 使用原有逻辑
+			function renderColors(colors) {
+				const colorOptions = $('#colorOptions');
+				colorOptions.empty();
+
+				colors.forEach(color => {
+					const colorCard = `
+	                    <div class="option-card" data-spec-id="${color.spec_id}">
+	                        <div style="font-size: 2.5rem; margin-bottom: 12px;">${color.emoji || '🔴'}</div>
+	                        <div style="font-weight: bold;">${color.spec_name}</div>
+	                        ${color.price && color.price !== "0" ? `<div style="color: #22c1c3; margin-top: 5px; font-weight: bold;">+¥${color.price}</div>` : ''}
+	                    </div>
+	                `;
+					colorOptions.append(colorCard);
+				});
+
+				// 绑定颜色选择事件
+				colorOptions.find('.option-card').on('click', function() {
+					const specId = $(this).data('spec-id');
+					const selectedColor = colors.find(c => c.spec_id == specId);
+
+					userSelection.color = selectedColor;
+
+					// 更新UI
+					colorOptions.find('.option-card').removeClass('selected');
+					$(this).addClass('selected');
+				});
+			}
+
+			// 加载配件数据 - 使用原有接口
+			function loadAccessories(goodsId) {
+				console.log('开始加载配件，商品ID:', goodsId);
+				const accessoriesGrid = $('#accessoriesGrid');
+				accessoriesGrid.html('<div class="loading-message"><span class="loading"></span> 加载配件中...</div>');
+
+				$.ajax({
+					url: `${baseApiUrl}/accessories`,
+					type: 'GET',
+					data: {
+						goods_id: goodsId
+					},
+					dataType: 'json',
+					success: function(response) {
+						console.log('配件加载响应:', response);
+						if (response.status === 200 && response.data) {
+							renderAccessories(response.data);
+							accessoriesLoaded = true; // 标记为已加载
+						} else {
+							accessoriesGrid.html('<div class="error-message">加载配件失败</div>');
+						}
+					},
+					error: function(xhr, status, error) {
+						console.error('配件加载错误:', error, xhr);
+						accessoriesGrid.html('<div class="error-message">加载配件失败，请稍后重试</div>');
+					}
+				});
+			}
+
+			// 渲染配件 - 使用原有逻辑
+			function renderAccessories(accessories) {
+				const accessoriesGrid = $('#accessoriesGrid');
+				accessoriesGrid.empty();
+
+				// 添加"不选择配件"选项
+				const noAccessoryCard = `
+	                <div class="accessory-card ${userSelection.accessories.length === 0 ? 'selected' : ''}" data-goods-id="0">	                    
+	                    <div class="accessory-info">
+	                        <div class="accessory-name">不选择配件</div>	                                            
+	                    </div>
+	                </div>
+	            `;
+				accessoriesGrid.append(noAccessoryCard);
+
+				if (accessories && accessories.length > 0) {
+					accessories.forEach(accessory => {
+						const price = accessory.price || '0.00';
+						const accessoryId = accessory.goods_id || accessory.accessory_id;
+						const isSelected = userSelection.accessories.some(item =>
+							(item.goods_id == accessoryId) || (item.accessory_id == accessoryId)
+						);
+
+						const accessoryCard = `
+	                        <div class="accessory-card ${isSelected ? 'selected' : ''}" data-goods-id="${accessoryId}">
+	                            <div class="product-img">
+	                            	${accessory.goods_image ?
+	                            	    `<img src="${accessory.goods_image}" alt="${accessory.goods_name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\\'fas fa-bullhorn whistle-icon\\'></i>';" />` :
+	                            	        '<i class="fas fa-bullhorn whistle-icon"></i>'
+	                            	}
+	                            </div>
+	                            <div class="accessory-info">
+	                                <div class="accessory-name">${accessory.goods_name || accessory.accessory_name}</div>
+	                                <div class="accessory-price">¥${price}</div>	                                
+	                            </div>
+	                        </div>
+	                    `;
+						accessoriesGrid.append(accessoryCard);
+					});
+				} else {
+					// 如果没有配件数据
+					accessoriesGrid.append('<div class="error-message">暂无可用配件</div>');
+				}
+
+				// 绑定配件选择事件（单选）
+				accessoriesGrid.find('.accessory-card').on('click', function() {
+					const goodsId = $(this).data('goods-id');
+
+					// 移除所有选择
+					accessoriesGrid.find('.accessory-card').removeClass('selected');
+					// 选择当前
+					$(this).addClass('selected');
+
+					if (goodsId == 0) {
+						userSelection.accessory = null;
+						userSelection.accessories = [];
+					} else {
+						const accessory = accessories.find(a =>
+							(a.goods_id == goodsId) || (a.accessory_id == goodsId)
+						);
+						if (accessory) {
+							userSelection.accessory = accessory;
+							userSelection.accessories = [accessory];
+						}
+					}
+
+					console.log('当前选择的配件:', userSelection.accessory);
+				});
+			}
+
+			// 选择个性化选项
+			$(document).on('click', '.personalization-option', function() {
+				$('.personalization-option').removeClass('selected');
+				$(this).addClass('selected');
+				userSelection.personalization = $(this).data('personalization');
+
+				// 处理刻字输入框
+				const engravingContainer = $('#engravingInputContainer');
+				if (userSelection.personalization === 'engraving') {
+					if (!engravingContainer.find('#customTextInput').length) {
+						engravingContainer.html(`
+	                        <div class="engraving-input-container">
+	                            <h4>刻字内容</h4>
+	                            <input type="text" id="customTextInput" 
+	                                   placeholder="请输入刻字内容（最多20个字）"
+	                                   maxlength="20">
+	                            <div class="char-count"><span id="charCount">0</span>/20</div>
+	                        </div>
+	                    `).show();
+
+						// 绑定输入事件
+						$('#customTextInput').on('input', function() {
+							userSelection.customText = $(this).val();
+							$('#charCount').text($(this).val().length);
+						});
+					} else {
+						engravingContainer.show();
+					}
+				} else {
+					engravingContainer.hide();
+					userSelection.customText = '';
+				}
+			});
+
+			// 提交订单 - 使用原有逻辑
+			function submitOrder() {
+				if (!validateCurrentStep()) {
+					return;
+				}
+
+				// 显示加载中
+				const submitBtn = $('.btn-submit');
+				const originalHtml = submitBtn.html();
+				submitBtn.html('<span class="loading"></span> 提交中...');
+				submitBtn.prop('disabled', true);
+
+				// 构建主商品SKU ID
+				let mainGoodsSkuId = '';
+				if (userSelection.color && userSelection.color.goods_sku_id) {
+					mainGoodsSkuId = userSelection.color.goods_sku_id;
+				} else if (userSelection.goods) {
+					// 如果没有颜色规格，使用商品默认SKU
+					mainGoodsSkuId = `${userSelection.goods.goods_id}_001`;
+				}
+
+				// 收集订单数据 - 保持原有结构
+				const orderData = {
+					appointment_date: "",
+					blessings: userSelection.message || "",
+					couponId: 0,
+					custom_image: "",
+					custom_text: userSelection.personalization === 'engraving' ? userSelection.customText || "" : "",
+					custom_type: userSelection.personalization === 'engraving' ? 'text' : (userSelection.personalization ===
+						'logo' ? 'image' : 'text'),
+					delivery: 10,
+					delivery_mode: "FAST",
+					goodsId: userSelection.goods.goods_id,
+					goodsNum: "1",
+					goodsSkuId: mainGoodsSkuId,
+					isUsePoints: 0,
+					mode: "buyNow",
+					remark: ""
+				};
+
+				// 如果有配件商品，添加到订单数据中
+				if (userSelection.accessory) {
+					orderData.accessoryGoodsId = userSelection.accessory.goods_id || userSelection.accessory.accessory_id;
+					orderData.accessoryGoodsSkuId = userSelection.accessory.sku ? userSelection.accessory.sku.goods_sku_id : '';
+					orderData.accessoryGoodsNum = "1";
+				}
+
+				console.log('提交订单数据:', orderData);
+
+				// 调用自己的接口，由接口转发到checkout/submit
+				$.ajax({
+					url: `${baseApiUrl}/submitOrder`,
+					type: 'POST',
+					data: JSON.stringify(orderData),
+					contentType: 'application/json',
+					dataType: 'json',
+					success: function(response) {
+						if (response.status === 200) {
+							// 保存订单信息
+							localStorage.setItem('lastOrder', JSON.stringify(response.data));
+							// 显示礼品动画
+							showGiftAnimation();
+							// 3秒后显示成功信息
+							setTimeout(() => {
+								showToast(
+									`订单提交成功！\n订单号：${response.data.order_no}\n总金额：¥${response.data.total_price}`,
+									3000);
+							}, 3000);
+						} else {
+							showToast('提交订单失败: ' + (response.message || '未知错误'));
+						}
+					},
+					error: function(xhr, status, error) {
+						console.error('订单提交错误:', error);
+						showToast('网络错误，请稍后重试: ' + error);
+					},
+					complete: function() {
+						submitBtn.html(originalHtml);
+						submitBtn.prop('disabled', false);
+					}
+				});
+			}
+
+			// 计算总价 - 使用原有逻辑
+			function calculateTotalPrice() {
+				let total = parseFloat(userSelection.goods.goods_price_min) || 0;
+
+				if (userSelection.color && userSelection.color.price) {
+					total += parseFloat(userSelection.color.price);
+				}
+
+				userSelection.accessories.forEach(accessory => {
+					total += parseFloat(accessory.price) || 0;
+				});
+
+				return total.toFixed(2);
+			}
+
+			// 显示礼品包装动画
+			function showGiftAnimation() {
+				giftAnimation.classList.add('active');
+
+				// 创建彩纸效果
+				createConfetti();
+
+				// 3秒后隐藏动画
+				setTimeout(() => {
+					giftAnimation.classList.remove('active');
+				}, 3000);
+			}
+
+			// 创建彩纸效果
+			function createConfetti() {
+				const colors = ['#ff8a00', '#e52e71', '#22c1c3', '#2a9d8f', '#f4a261'];
+				const container = giftAnimation;
+
+				for (let i = 0; i < 80; i++) {
+					const confetti = document.createElement('div');
+					confetti.className = 'confetti';
+					confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+					confetti.style.left = Math.random() * 100 + '%';
+					confetti.style.top = Math.random() * 100 + '%';
+					confetti.style.width = Math.random() * 10 + 5 + 'px';
+					confetti.style.height = Math.random() * 10 + 5 + 'px';
+					confetti.style.opacity = Math.random();
+					confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+					container.appendChild(confetti);
+
+					// 动画效果
+					const animation = confetti.animate([{
+							transform: 'translateY(0) rotate(0deg)',
+							opacity: 1
+						},
+						{
+							transform: `translateY(-80px) rotate(${Math.random() * 360}deg)`,
+							opacity: 0
+						}
+					], {
+						duration: 1500 + Math.random() * 2000,
+						easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
+					});
+
+					// 移除元素
+					animation.onfinish = () => confetti.remove();
+				}
+			}
+
+			// 初始化
+			$(document).ready(function() {
+				updateProgress();
+			});
+		</script>
+	</body>
+
+</html>
