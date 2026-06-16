@@ -1,0 +1,7 @@
+interface:
+  display_name: "Business Logic Analyzer"
+  short_description: "Analyze business flows and scope safe edits"
+  default_prompt: "Use $business-logic-analyzer to map the relevant business flow, generate docs, and narrow the edit scope before changing code."
+
+policy:
+  allow_implicit_invocation: true
